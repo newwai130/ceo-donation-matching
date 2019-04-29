@@ -4,6 +4,7 @@ import queue
 import csv
 import pymysql
 import traceback
+from whoswho import who
 
 # 子執行緒類別
 class Worker(threading.Thread):
@@ -39,7 +40,7 @@ def main():
 		for row in rows:
 			my_queue.put(row)
 
-	db = pymysql.connect("192.168.1.58", "wai", "123", "mm", charset='utf8' )
+	db = pymysql.connect("127.0.0.1", "wai", "123", "mm", charset='utf8' )
 	cursor = db.cursor()
 
 	i=0
@@ -60,7 +61,7 @@ def main():
 			cursor.execute(sql)
 			results = cursor.fetchall()
 
-			if(i%5000==0):
+			if(i%1000==0):
 				print(i)
 
 			for row in results:
@@ -74,26 +75,23 @@ def main():
 				cname2 = cname2.replace("\'", "\'\'")
 				cname3 = cname3.replace("\'", "\'\'")
 				cname4 = cname4.replace("\'", "\'\'")
-				ceo_name = ceo_name.replace("\'", "\'\'")
 
 				cname_year1 = row[4]
 				cname_year2 = cname_year1 + 1
 				
-				sql = 'SELECT * from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND RecipID in (\''+ceo_name+'\') AND RecipID <> \'\''
-				#print(sql)
+				sql = 'SELECT * from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND Orgname in (\''+cname1+'\',\''+cname2+'\',\''+cname3+'\',\''+cname4+'\') AND Orgname <> \'\''
 				cursor.execute(sql)
 				donation_results = cursor.fetchall()
 				if(len(donation_results) > 0):
-					print("found: "+ str(len(donation_results)))
 					for donation_result in donation_results:
-						print(donation_result)
-						print(ceo_name)
-						print(cname_year1)
-						print(ceo_company)
-						input()
-
+						donor = donation_result[3]
+						if(who.match(ceo_name,donor)):
+							print(ceo_row)
+							print(donation_result)
+							temp = 1
 
 	except Exception:
+		print(sql)
 		traceback.print_exc()
 	
 	"""

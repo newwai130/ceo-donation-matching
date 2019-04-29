@@ -44,6 +44,7 @@ def main():
 	cursor = db.cursor()
 
 	i=0
+	found = 0
 	try:
 		while not my_queue.empty():
 			i+=1
@@ -86,10 +87,10 @@ def main():
 					for donation_result in donation_results:
 						donor = donation_result[3]
 						if(who.match(ceo_name,donor)):
-							print(ceo_row)
-							print(donation_result)
-							temp = 1
-
+							#print(ceo_row)
+							#print(donation_result)
+							found += 1
+		print("found: ", found)					
 	except Exception:
 		print(sql)
 		traceback.print_exc()

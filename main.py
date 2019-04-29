@@ -54,7 +54,7 @@ def main():
 			ceo_name = ceo_name.replace("\'", "\'\'")
 			ceo_company = ceo_company.replace("\'", "\'\'")
 
-			sql = 'SELECT cname, namefmac, compustatname, Acronym from Company WHERE (cname = \"'+ ceo_company+'\" OR namefmac = \"'+ ceo_company +'\" OR compustatname = \"'+ ceo_company+'\" OR Acronym = \"'+ ceo_company+'\") AND (year='+ ceo_year+');';
+			sql = 'SELECT cname, namefmac, compustatname, Acronym, year, exec_fullname from Company WHERE (cname = \"'+ ceo_company+'\" OR namefmac = \"'+ ceo_company +'\" OR compustatname = \"'+ ceo_company+'\" OR Acronym = \"'+ ceo_company+'\") AND (year='+ ceo_year+');';
 			#print(sql)
 
 			cursor.execute(sql)
@@ -63,21 +63,39 @@ def main():
 			if(i%5000==0):
 				print(i)
 
-			if(len(results) > 0):
-				print(ceo_company)
-				print(results)
-				input()
-			"""
 			for row in results:
-				fname = row[0]
-				lname = row[1]
-				age = row[2]
-				sex = row[3]
-				income = row[4]
-				print(fname)
-			"""
+				cname1 = row[0]
+				cname2 = row[1]
+				cname3 = row[2]
+				cname4 = row[3]
+				ceo_name = row[5]
+
+				cname1 = cname1.replace("\'", "\'\'")
+				cname2 = cname2.replace("\'", "\'\'")
+				cname3 = cname3.replace("\'", "\'\'")
+				cname4 = cname4.replace("\'", "\'\'")
+				ceo_name = ceo_name.replace("\'", "\'\'")
+
+				cname_year1 = row[4]
+				cname_year2 = cname_year1 + 1
+				
+				sql = 'SELECT * from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND RecipID in (\''+ceo_name+'\') AND RecipID <> \'\''
+				#print(sql)
+				cursor.execute(sql)
+				donation_results = cursor.fetchall()
+				if(len(donation_results) > 0):
+					print("found: "+ str(len(donation_results)))
+					for donation_result in donation_results:
+						print(donation_result)
+						print(ceo_name)
+						print(cname_year1)
+						print(ceo_company)
+						input()
+
+
 	except Exception:
 		traceback.print_exc()
+	
 	"""
 	threads = []
 	for i in range(5):

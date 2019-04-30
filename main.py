@@ -46,10 +46,12 @@ def main():
 	i=0
 	found = 0
 	try:
+		output_rows = []
 		while not my_queue.empty():
 			i+=1
 			ceo_row = my_queue.get()
 			ceo_year = ceo_row[1]
+			ceo_id = ceo_row[2]
 			ceo_name = ceo_row[4]
 			ceo_company = ceo_row[7]
 
@@ -78,22 +80,38 @@ def main():
 				cname4 = cname4.replace("\'", "\'\'")
 
 				cname_year1 = row[4]
-				cname_year2 = cname_year1 + 1
+				cname_year2 = cname_year1 - 1
 				
 				sql = 'SELECT * from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND Orgname in (\''+cname1+'\',\''+cname2+'\',\''+cname3+'\',\''+cname4+'\') AND Orgname <> \'\''
 				cursor.execute(sql)
 				donation_results = cursor.fetchall()
 				if(len(donation_results) > 0):
 					for donation_result in donation_results:
-						donor = donation_result[3]
-						if(who.match(ceo_name,donor)):
-							#print(ceo_row)
-							#print(donation_result)
-							found += 1
-		print("found: ", found)					
+						donation_date = donation_result[1]
+						donation_donor = donation_result[3]
+						if(who.match(ceo_name,donation_donor)):
+							if(donation_date.find(str(ceo_year)) >= 0):
+								output_row = [ceo_id] + list(donation_result)
+								output_rows.append(output_row)
+								print(output_row)
+								found += 1
+		print("found: ", found)
+
+		with open('output.csv', 'w', newline='') as csvfile:
+			 # 建立 CSV 檔寫入器
+  			writer = csv.writer(csvfile)
+
+  			writer.writerow(['execid', 'Cycle', 'Date', 'ContribID', 'Contrib', 'RecipID', 'Orgname', 'UltOrg', 'Occupation', 'RealCode', 'Amount', 'State', 'Zip', 'RecipCode', 'Type', 'Gender', 'reccode1', 'reccode2'])
+
+  			for output_row in output_rows:
+  				writer.writerow(output_row)
+
+
 	except Exception:
 		print(sql)
 		traceback.print_exc()
+	finally:
+		db.close()
 	
 	"""
 	threads = []

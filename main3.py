@@ -57,9 +57,9 @@ class Worker(threading.Thread):
 					self.cursor.execute(sql)
 					donation_results = self.cursor.fetchall()
 					if(len(donation_results) > 0):
-						print("Worker %d: %d  CEO:  %d    Donation:  %d   Current: %d" % (self.id, self.input_queue.qsize(), len(results), len(donation_results)), self.output_queue.qsize())
+						print("Worker %d: %d  CEO:  %d    Donation:  %d   Current: %d" % (self.id, self.input_queue.qsize(), len(results), len(donation_results), self.output_queue.qsize())
 					else:
-						print("Worker %d: %d  CEO:  %d    Current: %d" % (self.id, self.input_queue.qsize(),len(results)), self.output_queue.qsize() )
+						print("Worker %d: %d  CEO:  %d    Current: %d" % (self.id, self.input_queue.qsize(),len(results), self.output_queue.qsize())
 
 					for donation_result in donation_results:
 						donation_donor_name = donation_result[0]

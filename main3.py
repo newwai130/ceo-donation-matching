@@ -57,9 +57,9 @@ class Worker(threading.Thread):
 					self.cursor.execute(sql)
 					donation_results = self.cursor.fetchall()
 					if(len(donation_results) > 0):
-						print("Worker %d: %d  CEO:  %d    Donation:  %d" % (self.id, self.input_queue.qsize(), len(results), len(donation_results)))
+						print("Worker %d: %d  CEO:  %d    Donation:  %d   Current: %d" % (self.id, self.input_queue.qsize(), len(results), len(donation_results)), self.output_queue.qsize())
 					else:
-						print("Worker %d: %d  CEO:  %d" % (self.id, self.input_queue.qsize(),len(results)))
+						print("Worker %d: %d  CEO:  %d    Current: %d" % (self.id, self.input_queue.qsize(),len(results)), self.output_queue.qsize() )
 
 					for donation_result in donation_results:
 						donation_donor_name = donation_result[0]
@@ -105,13 +105,13 @@ def main():
 
 
 
-	thread_num = 10
+	thread_num = 15
 	threads = []
 	for i in range(thread_num):
 		threads.append(Worker(input_queue, output_queue, i))
+		threads[i].start()
 
 	for i in range(thread_num):
-		threads[i].start()
 		threads[i].join()
 
 	input_queue.join()

@@ -37,6 +37,9 @@ class Worker(threading.Thread):
 				self.cursor.execute(sql)
 				results = self.cursor.fetchall()
 
+				if(len(results) > 0):
+					print("Worker %d: in progress matching company,    length: %s" % (self.id, len(results)))
+
 				for row in results:
 					cname1 = row[0] if row[0] else "Condition never match"
 					cname2 = row[1] if row[1] else "Condition never match"
@@ -57,9 +60,9 @@ class Worker(threading.Thread):
 					self.cursor.execute(sql)
 					donation_results = self.cursor.fetchall()
 					if(len(donation_results) > 0):
-						print("Worker %d: %d  CEO:  %d    Donation:  %d   Current: %d" % (self.id, self.input_queue.qsize(), len(results), len(donation_results), self.output_queue.qsize()))
+						print("Worker %d: in progress finding donation,   job id: %d  CEO:  %d    Donation:  %d   Current: %d" % (self.id, self.input_queue.qsize(), len(results), len(donation_results), self.output_queue.qsize()))
 					else:
-						print("Worker %d: %d  CEO:  %d    Current: %d" % (self.id, self.input_queue.qsize(),len(results), self.output_queue.qsize()))
+						print("Worker %d: in progress finding donation,   job id: %d  CEO:  %d    Current: %d" % (self.id, self.input_queue.qsize(),len(results), self.output_queue.qsize()))
 
 					for donation_result in donation_results:
 						donation_donor_name = donation_result[0]
@@ -69,7 +72,9 @@ class Worker(threading.Thread):
 							self.cursor.execute(sql)
 							name_matched_donation_results = self.cursor.fetchall()
 
-							print("current size: ",self.output_queue.qsize())
+							if(len(name_matched_donation_results) > 0):
+								print("Worker %d: in progress matching name,    length: %s" % (self.id, len(name_matched_donation_results)))
+
 
 							for name_matched_donation_result in name_matched_donation_results:
 								output_row = [ceo_id] + list(name_matched_donation_result)

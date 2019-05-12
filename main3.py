@@ -38,11 +38,11 @@ class Worker(threading.Thread):
 				results = self.cursor.fetchall()
 
 				for row in results:
-					cname1 = row[0]
-					cname2 = row[1]
-					cname3 = row[2]
-					cname4 = row[3]
-					ceo_name = row[5]
+					cname1 = row[0] if row[0] else "Condition never match"
+					cname2 = row[1] if row[1] else "Condition never match"
+					cname3 = row[2] if row[2] else "Condition never match"
+					cname4 = row[3] if row[3] else "Condition never match"
+					ceo_name = row[5] if row[5] else "Condition never match"
 
 					cname1 = cname1.replace("\'", "\'\'")
 					cname2 = cname2.replace("\'", "\'\'")
@@ -57,15 +57,15 @@ class Worker(threading.Thread):
 					self.cursor.execute(sql)
 					donation_results = self.cursor.fetchall()
 					if(len(donation_results) > 0):
-						print("Worker %d: %d  CEO:  %d    Donation:  %d   Current: %d" % (self.id, self.input_queue.qsize(), len(results), len(donation_results), self.output_queue.qsize())
+						print("Worker %d: %d  CEO:  %d    Donation:  %d   Current: %d" % (self.id, self.input_queue.qsize(), len(results), len(donation_results), self.output_queue.qsize()))
 					else:
-						print("Worker %d: %d  CEO:  %d    Current: %d" % (self.id, self.input_queue.qsize(),len(results), self.output_queue.qsize())
+						print("Worker %d: %d  CEO:  %d    Current: %d" % (self.id, self.input_queue.qsize(),len(results), self.output_queue.qsize()))
 
 					for donation_result in donation_results:
 						donation_donor_name = donation_result[0]
 						donation_donor_name = donation_donor_name.replace("\'", "\'\'")
 						if(who.match(ceo_name,donation_donor_name)):
-							sql = 'SELECT * from Donation WHERE RecipID = \"' + donation_donor_name + '\";'
+							sql = 'SELECT * from Donation WHERE Contrib = \"' + donation_donor_name + '\";'
 							self.cursor.execute(sql)
 							name_matched_donation_results = self.cursor.fetchall()
 

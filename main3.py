@@ -17,9 +17,9 @@ class Worker(threading.Thread):
 		self.id = id
 
 	def run(self):
-	    while self.input_queue.qsize() > 0:
-	    	try:
-				ceo_row = input_queue.get()
+		while self.input_queue.qsize() > 0:
+			try:
+				ceo_row = self.input_queue.get()
 				ceo_year = ceo_row[1]
 				ceo_id = ceo_row[2]
 				ceo_name = ceo_row[4]
@@ -33,8 +33,8 @@ class Worker(threading.Thread):
 				sql = 'SELECT cname, namefmac, compustatname, Acronym, year, exec_fullname from Company WHERE (cname = \"'+ ceo_company+'\" OR namefmac = \"'+ ceo_company +'\" OR compustatname = \"'+ ceo_company+'\" OR Acronym = \"'+ ceo_company+'\") AND (year='+ ceo_year+');';
 				#print(sql)
 
-				cursor.execute(sql)
-				results = cursor.fetchall()
+				self.cursor.execute(sql)
+				results = self.cursor.fetchall()
 
 				for row in results:
 					cname1 = row[0]
@@ -53,16 +53,16 @@ class Worker(threading.Thread):
 						
 					sql = 'SELECT * from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND (Orgname in (\''+cname1+'\',\''+cname2+'\',\''+cname3+'\',\''+cname4+'\') OR (Orgname LIKE \"'+ ceo_company_name_first_word+'%\")) AND Orgname <> \'\''
 						 
-					cursor.execute(sql)
-					donation_results = cursor.fetchall()
+					self.cursor.execute(sql)
+					donation_results = self.cursor.fetchall()
 
 					for donation_result in donation_results:
 						donation_donor_name = donation_result[3]
 						donation_donor_name = donation_donor_name.replace("\'", "\'\'")
 						if(who.match(ceo_name,donation_donor_name)):
 							sql = 'SELECT * from Donation WHERE RecipID = \"' + donation_donor_name + '\";'
-							cursor.execute(sql)
-							name_matched_donation_results = cursor.fetchall()
+							self.cursor.execute(sql)
+							name_matched_donation_results = self.cursor.fetchall()
 
 							for name_matched_donation_result in name_matched_donation_results:
 								output_row = [ceo_id] + list(name_matched_donation_result)
@@ -70,10 +70,10 @@ class Worker(threading.Thread):
 			except Exception:
 				traceback.print_exc()
 			finally:
-				db.close()
+				# 處理資料
+				print("Worker %d: %s" % (self.id, self.input_queue.qsize()))
 
-      # 處理資料
-      print("Worker %d: %s" % (self.id, self.input_queue.qsize()))
+		
      
 
 
@@ -82,7 +82,7 @@ def main():
 
 	# 建立佇列
 	input_queue = queue.Queue()
-	output = queue.Queue()
+	output_queue = queue.Queue()
 
 	# 將資料放入佇列
 	with open('Ceo.csv', newline='') as csvfile:

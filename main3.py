@@ -84,6 +84,7 @@ class Worker(threading.Thread):
 			finally:
 				# 處理資料
 				print("Worker %d: %s" % (self.id, self.input_queue.qsize()))
+		print("Worker %d  End" % (self.id)
 
 		
      

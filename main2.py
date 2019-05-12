@@ -54,12 +54,12 @@ def main():
 			ceo_id = ceo_row[2]
 			ceo_name = ceo_row[4]
 			ceo_company = ceo_row[7]
-			ceo_company_substring = (ceo_company.split())[0]
+			ceo_company_name_first_word = (ceo_company.split())[0]
 
 			ceo_name = ceo_name.replace("\'", "\'\'")
 			ceo_company = ceo_company.replace("\'", "\'\'")
 
-			sql = 'SELECT cname, namefmac, compustatname, Acronym, year, exec_fullname from Company WHERE ((cname = \"'+ ceo_company+'\" OR namefmac = \"'+ ceo_company +'\" OR compustatname = \"'+ ceo_company+'\" OR Acronym = \"'+ ceo_company+'\") OR (cname LIKE \"'+ ceo_company_substring+'%\" OR namefmac LIKE \"'+ ceo_company +'%\" OR compustatname LIKE \"'+ ceo_company+'%\" OR Acronym LIKE \"'+ ceo_company+'%\")) AND (year='+ ceo_year+');';
+			sql = 'SELECT cname, namefmac, compustatname, Acronym, year, exec_fullname from Company WHERE (cname = \"'+ ceo_company+'\" OR namefmac = \"'+ ceo_company +'\" OR compustatname = \"'+ ceo_company+'\" OR Acronym = \"'+ ceo_company+'\") AND (year='+ ceo_year+');';
 			#print(sql)
 
 			cursor.execute(sql)
@@ -83,16 +83,20 @@ def main():
 				cname_year1 = row[4]
 				cname_year2 = cname_year1 - 1
 				
-				sql = 'SELECT * from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND Orgname in (\''+cname1+'\',\''+cname2+'\',\''+cname3+'\',\''+cname4+'\') AND Orgname <> \'\''
+				sql = 'SELECT * from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND (Orgname in (\''+cname1+'\',\''+cname2+'\',\''+cname3+'\',\''+cname4+'\') OR (Orgname LIKE \"'+ ceo_company_name_first_word+'%\")) AND Orgname <> \'\''
+				 
 				cursor.execute(sql)
 				donation_results = cursor.fetchall()
 				if(len(donation_results) > 0):
 					for donation_result in donation_results:
-						donation_date = donation_result[1]
-						donation_donor = donation_result[3]
+						donation_donor_name = donation_result[3]
+						donation_donor_name = donation_donor_name.replace("\'", "\'\'")
 						if(who.match(ceo_name,donation_donor)):
-							if(donation_date.find(str(ceo_year)) >= 0):
-								output_row = [ceo_id] + list(donation_result)
+							sql = 'SELECT * from Donation WHERE exec_fullname = \"' + donation_donor_name + '\";'
+							cursor.execute(sql)
+							name_matched_donation_results = cursor.fetchall()
+							for name_matched_donation_result in name_matched_donation_results:
+								output_row = [ceo_id] + list(name_matched_donation_result)
 								output_rows.append(output_row)
 								print(output_row)
 								found += 1

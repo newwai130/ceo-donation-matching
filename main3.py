@@ -129,7 +129,7 @@ def main():
 
 	writer.writerow(['execid', 'Cycle', 'Date', 'ContribID', 'Contrib', 'RecipID', 'Orgname', 'UltOrg', 'Occupation', 'RealCode', 'Amount', 'State', 'Zip', 'RecipCode', 'Type', 'Gender', 'reccode1', 'reccode2'])
 
-	while(output_queue.qsize() > 0):
+	while(output_queue.empty() == False:):
 		output_row = output_queue.get()
 		writer.writerow(output_row)
 

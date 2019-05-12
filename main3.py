@@ -5,6 +5,7 @@ import csv
 import pymysql
 import traceback
 from whoswho import who
+from time import time
 
 # 子執行緒類別
 class Worker(threading.Thread):
@@ -17,7 +18,7 @@ class Worker(threading.Thread):
 		self.id = id
 
 	def run(self):
-		while self.input_queue.qsize() > 0:
+		while self.input_queue.empty() == False:
 			try:
 				ceo_row = self.input_queue.get()
 				ceo_year = ceo_row[1]
@@ -51,22 +52,28 @@ class Worker(threading.Thread):
 					cname_year1 = row[4]
 					cname_year2 = cname_year1 - 1
 						
-					sql = 'SELECT * from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND (Orgname in (\''+cname1+'\',\''+cname2+'\',\''+cname3+'\',\''+cname4+'\') OR (Orgname LIKE \"'+ ceo_company_name_first_word+'%\")) AND Orgname <> \'\''
+					sql = 'SELECT RecipID from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND (Orgname in (\''+cname1+'\',\''+cname2+'\',\''+cname3+'\',\''+cname4+'\') OR (Orgname LIKE \"'+ ceo_company_name_first_word+'%\")) AND Orgname <> \'\''
 						 
 					self.cursor.execute(sql)
 					donation_results = self.cursor.fetchall()
+					if(len(donation_results) > 0):
+						print("Worker %d: %d  CEO:  %d    Donation:  %d" % (self.id, self.input_queue.qsize(), len(results), len(donation_results)))
+					else:
+						print("Worker %d: %d  CEO:  %d" % (self.id, self.input_queue.qsize(),len(results)))
 
 					for donation_result in donation_results:
-						donation_donor_name = donation_result[3]
+						donation_donor_name = donation_result[0]
 						donation_donor_name = donation_donor_name.replace("\'", "\'\'")
 						if(who.match(ceo_name,donation_donor_name)):
 							sql = 'SELECT * from Donation WHERE RecipID = \"' + donation_donor_name + '\";'
 							self.cursor.execute(sql)
 							name_matched_donation_results = self.cursor.fetchall()
 
+							print("current size: ",self.output_queue.qsize())
+
 							for name_matched_donation_result in name_matched_donation_results:
 								output_row = [ceo_id] + list(name_matched_donation_result)
-								self.output_queue.append(output_row)
+								self.output_queue.put(output_row)
 			except Exception:
 				traceback.print_exc()
 			finally:
@@ -96,6 +103,8 @@ def main():
 		for row in rows:
 			input_queue.put(row)
 
+
+
 	thread_num = 10
 	threads = []
 	for i in range(thread_num):
@@ -103,10 +112,10 @@ def main():
 
 	for i in range(thread_num):
 		threads[i].start()
-
-	for i in range(thread_num):
-		threads[i].start()
 		threads[i].join()
+
+	input_queue.join()
+
 
 	with open('output.csv', 'w', newline='') as csvfile:
 		 # 建立 CSV 檔寫入器

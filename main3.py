@@ -127,11 +127,11 @@ def main():
 		 # 建立 CSV 檔寫入器
 		writer = csv.writer(csvfile)
 
-	writer.writerow(['execid', 'Cycle', 'Date', 'ContribID', 'Contrib', 'RecipID', 'Orgname', 'UltOrg', 'Occupation', 'RealCode', 'Amount', 'State', 'Zip', 'RecipCode', 'Type', 'Gender', 'reccode1', 'reccode2'])
+		writer.writerow(['execid', 'Cycle', 'Date', 'ContribID', 'Contrib', 'RecipID', 'Orgname', 'UltOrg', 'Occupation', 'RealCode', 'Amount', 'State', 'Zip', 'RecipCode', 'Type', 'Gender', 'reccode1', 'reccode2'])
 
-	while(output_queue.empty() == False:):
-		output_row = output_queue.get()
-		writer.writerow(output_row)
+		while(output_queue.empty() == False:):
+			output_row = output_queue.get()
+			writer.writerow(output_row)
 
 
 	

@@ -121,6 +121,7 @@ def main():
 
 	input_queue.join()
 
+	print("Start writing output file")
 
 	with open('output.csv', 'w', newline='') as csvfile:
 		 # 建立 CSV 檔寫入器

@@ -55,7 +55,7 @@ class Worker(threading.Thread):
 					cname_year1 = row[4]
 					cname_year2 = cname_year1 - 1
 						
-					sql = 'SELECT Contrib from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND (Orgname in (\''+cname1+'\',\''+cname2+'\',\''+cname3+'\',\''+cname4+'\') OR (Orgname LIKE \"'+ ceo_company_name_first_word+' %\")) AND Orgname <> \'\''
+					sql = 'SELECT Contrib from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND (Orgname in (\''+cname1+'\',\''+cname2+'\',\''+cname3+'\',\''+cname4+'\') OR (Orgname LIKE \''+ ceo_company_name_first_word+' %\')) AND Orgname <> \'\''
 						 
 					self.cursor.execute(sql)
 					donation_results = self.cursor.fetchall()
@@ -66,9 +66,9 @@ class Worker(threading.Thread):
 
 					for donation_result in donation_results:
 						donation_donor_name = donation_result[0]
-						donation_donor_name = donation_donor_name.replace("\'", "\'\'")
+						donation_donor_name_in_sql_format = donation_donor_name.replace("\'", "\'\'")
 						if(who.match(ceo_name,donation_donor_name)):
-							sql = 'SELECT * from Donation WHERE Contrib = \"' + donation_donor_name + '\";'
+							sql = 'SELECT * from Donation WHERE Contrib = \"' + donation_donor_name_in_sql_format + '\";'
 							self.cursor.execute(sql)
 							name_matched_donation_results = self.cursor.fetchall()
 

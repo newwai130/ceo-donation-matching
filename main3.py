@@ -45,7 +45,7 @@ class Worker(threading.Thread):
 					cname2 = row[1] if row[1] else "Condition never match"
 					cname3 = row[2] if row[2] else "Condition never match"
 					cname4 = row[3] if row[3] else "Condition never match"
-					ceo_name = row[5] if row[5] else "Condition never match"
+					ceo_name = row[5]
 
 					cname1 = cname1.replace("\'", "\'\'")
 					cname2 = cname2.replace("\'", "\'\'")
@@ -55,7 +55,7 @@ class Worker(threading.Thread):
 					cname_year1 = row[4]
 					cname_year2 = cname_year1 - 1
 						
-					sql = 'SELECT Contrib from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND (Orgname in (\''+cname1+'\',\''+cname2+'\',\''+cname3+'\',\''+cname4+'\') OR (Orgname LIKE \''+ ceo_company_name_first_word+' %\')) AND Orgname <> \'\''
+					sql = 'SELECT Contrib from Donation WHERE Cycle in ('+str(cname_year1)+','+str(cname_year2)+') AND ((Orgname in (\''+cname1+'\',\''+cname2+'\',\''+cname3+'\',\''+cname4+'\')) OR (Orgname LIKE \''+ ceo_company_name_first_word+' %\')) AND Orgname <> \'\''
 						 
 					self.cursor.execute(sql)
 					donation_results = self.cursor.fetchall()

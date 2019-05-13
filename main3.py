@@ -84,10 +84,7 @@ class Worker(threading.Thread):
 			finally:
 				# 處理資料
 				print("Worker %d: %s" % (self.id, self.input_queue.qsize()))
-		print("Worker %d  End" % (self.id)
-
-		
-     
+		print("Worker %d  End" % (self.id))
 
 
 # 建立 5 個子執行緒
@@ -111,7 +108,7 @@ def main():
 
 
 
-	thread_num = 15
+	thread_num = 16
 	threads = []
 	for i in range(thread_num):
 		threads.append(Worker(input_queue, output_queue, i))
@@ -119,8 +116,6 @@ def main():
 
 	for i in range(thread_num):
 		threads[i].join()
-
-	input_queue.join()
 
 	print("Start writing output file")
 
